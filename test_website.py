@@ -1,9 +1,11 @@
 """Produktcheck für die Nordwerk-Website (unabhängig von der Factory).
 
 Aufruf:
-    python -m unittest test_website -v
-oder
     python test_website.py
+oder
+    python -m unittest test_website -v
+
+Enthält 8 Checks (B4 in Termin 3).
 """
 
 import unittest
@@ -52,26 +54,32 @@ class NordwerkWebsiteTest(unittest.TestCase):
         cls.parser.feed(cls.html)
         cls.text = " ".join(t.strip() for t in cls.parser.text_parts if t.strip())
 
-    def test_language_and_title(self):
+    def test_01_html_language_is_de(self):
         self.assertEqual(self.parser.lang, "de")
+
+    def test_02_document_title_contains_company(self):
         self.assertIn("Nordwerk Industrie-Service", self.parser.title)
 
-    def test_company_name_and_main_statement(self):
+    def test_03_company_name_present(self):
         self.assertIn("Nordwerk Industrie-Service", self.text)
+
+    def test_04_main_statement_present(self):
         self.assertIn("Praktische Unterstützung für Ihren technischen Betrieb.", self.text)
 
-    def test_one_service_present(self):
+    def test_05_service_wartungsplanung_present(self):
         self.assertIn("Wartungsplanung", self.text)
         self.assertIn(
             "Wir strukturieren Wartungsaufgaben und dokumentieren Zuständigkeiten",
             self.text,
         )
 
-    def test_contact_link_and_exercise_notice(self):
+    def test_06_contact_mailto_link(self):
         self.assertIn("mailto:kontakt@nordwerk.example", self.parser.hrefs)
+
+    def test_07_exercise_notice_present(self):
         self.assertIn("Fiktives Unternehmen – Lehrprojekt der HAW Hamburg", self.text)
 
-    def test_no_external_assets(self):
+    def test_08_no_external_assets(self):
         for ref in self.parser.asset_refs:
             self.assertFalse(ref.startswith("http://"), ref)
             self.assertFalse(ref.startswith("https://"), ref)
